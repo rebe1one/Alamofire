@@ -108,16 +108,16 @@ open class SessionDelegate: NSObject {
 #if !os(watchOS)
 
     /// Overrides default behavior for URLSessionStreamDelegate method `urlSession(_:readClosedFor:)`.
-    open var streamTaskReadClosed: ((URLSession, URLSessionStreamTask) -> Void)?
+    open var streamTaskReadClosed: ((URLSession, URLSessionTask) -> Void)?
 
     /// Overrides default behavior for URLSessionStreamDelegate method `urlSession(_:writeClosedFor:)`.
-    open var streamTaskWriteClosed: ((URLSession, URLSessionStreamTask) -> Void)?
+    open var streamTaskWriteClosed: ((URLSession, URLSessionTask) -> Void)?
 
     /// Overrides default behavior for URLSessionStreamDelegate method `urlSession(_:betterRouteDiscoveredFor:)`.
-    open var streamTaskBetterRouteDiscovered: ((URLSession, URLSessionStreamTask) -> Void)?
+    open var streamTaskBetterRouteDiscovered: ((URLSession, URLSessionTask) -> Void)?
 
     /// Overrides default behavior for URLSessionStreamDelegate method `urlSession(_:streamTask:didBecome:outputStream:)`.
-    open var streamTaskDidBecomeInputAndOutputStreams: ((URLSession, URLSessionStreamTask, InputStream, OutputStream) -> Void)?
+    open var streamTaskDidBecomeInputAndOutputStreams: ((URLSession, URLSessionTask, InputStream, OutputStream) -> Void)?
 
 #endif
 
@@ -166,17 +166,19 @@ open class SessionDelegate: NSObject {
         #endif
 
         #if !os(watchOS)
-            switch selector {
-            case #selector(URLSessionStreamDelegate.urlSession(_:readClosedFor:)):
-                return streamTaskReadClosed != nil
-            case #selector(URLSessionStreamDelegate.urlSession(_:writeClosedFor:)):
-                return streamTaskWriteClosed != nil
-            case #selector(URLSessionStreamDelegate.urlSession(_:betterRouteDiscoveredFor:)):
-                return streamTaskBetterRouteDiscovered != nil
-            case #selector(URLSessionStreamDelegate.urlSession(_:streamTask:didBecome:outputStream:)):
-                return streamTaskDidBecomeInputAndOutputStreams != nil
-            default:
-                break
+            if #available(iOS 9, *) {
+                switch selector {
+                case #selector(URLSessionStreamDelegate.urlSession(_:readClosedFor:)):
+                    return streamTaskReadClosed != nil
+                case #selector(URLSessionStreamDelegate.urlSession(_:writeClosedFor:)):
+                    return streamTaskWriteClosed != nil
+                case #selector(URLSessionStreamDelegate.urlSession(_:betterRouteDiscoveredFor:)):
+                    return streamTaskBetterRouteDiscovered != nil
+                case #selector(URLSessionStreamDelegate.urlSession(_:streamTask:didBecome:outputStream:)):
+                    return streamTaskDidBecomeInputAndOutputStreams != nil
+                default:
+                    break
+                }
             }
         #endif
 
@@ -642,6 +644,7 @@ extension SessionDelegate: URLSessionStreamDelegate {
     ///
     /// - parameter session:    The session.
     /// - parameter streamTask: The stream task.
+    @available(iOS 9, *)
     open func urlSession(_ session: URLSession, readClosedFor streamTask: URLSessionStreamTask) {
         streamTaskReadClosed?(session, streamTask)
     }
@@ -650,6 +653,7 @@ extension SessionDelegate: URLSessionStreamDelegate {
     ///
     /// - parameter session:    The session.
     /// - parameter streamTask: The stream task.
+    @available(iOS 9, *)
     open func urlSession(_ session: URLSession, writeClosedFor streamTask: URLSessionStreamTask) {
         streamTaskWriteClosed?(session, streamTask)
     }
@@ -658,6 +662,7 @@ extension SessionDelegate: URLSessionStreamDelegate {
     ///
     /// - parameter session:    The session.
     /// - parameter streamTask: The stream task.
+    @available(iOS 9, *)
     open func urlSession(_ session: URLSession, betterRouteDiscoveredFor streamTask: URLSessionStreamTask) {
         streamTaskBetterRouteDiscovered?(session, streamTask)
     }
@@ -668,6 +673,7 @@ extension SessionDelegate: URLSessionStreamDelegate {
     /// - parameter streamTask:   The stream task.
     /// - parameter inputStream:  The new input stream.
     /// - parameter outputStream: The new output stream.
+    @available(iOS 9, *)
     open func urlSession(
         _ session: URLSession,
         streamTask: URLSessionStreamTask,
